@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LöEmber - Hobby Programmer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --charcoal:#151311;
+    --ember-amber:#FFB52E;
+    --flame-orange:#FF5722;
+    --brown-soft:#6B5847;
+    --grey-ash:#34302C;
+    --line:#D8CFBD;
+    --ash-white:#F4EDE2;
+    --header-h:56px;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;background:var(--charcoal);}
+  body{
+    background:var(--charcoal);color:var(--ash-white);
+    font-family:'Jost',sans-serif;font-weight:400;line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.anton{font-family:"Anton",sans-serif;font-weight:400;line-height:.9;text-transform:uppercase;}
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  :focus-visible{outline:3px solid var(--ember-amber);outline-offset:3px;}
+
+  /* ---------- header: flat, no blur ---------- */
+  header{
+    position:sticky;top:0;z-index:100;height:var(--header-h);
+    background:var(--charcoal);border-bottom:2px solid var(--ash-white);
+  }
+  nav{height:100%;padding:0 20px;display:flex;align-items:center;justify-content:space-between;}
+  .logo-container{height:34px;width:34px;}
+  .logo-container img{width:100%;height:100%;object-fit:contain;}
+  .nav-center{display:flex;gap:28px;}
+  .nav-center a{font-size:17px;font-weight:500;}
+  .nav-center a:hover{background:var(--flame-orange);color:var(--charcoal);}
+  .nav-center a:nth-child(2){margin-top:6px;}   /* a little off */
+  .nav-center a:nth-child(4){margin-top:-4px;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    position:relative;min-height:calc(100svh - var(--header-h));
+    overflow:hidden;background:var(--charcoal);
+  }
+  .text-bg{
+    position:absolute;inset:0;width:100%;height:100%;
+    object-fit:cover;object-position:left top;
+    filter:grayscale(1) contrast(1.3) brightness(.45);
+  }
+  .hero-overlay{position:absolute;inset:0;background:var(--flame-orange);mix-blend-mode:multiply;opacity:.55;}
+  .hero-inner{position:absolute;inset:0;}
+
+  .hero h1{
+    position:absolute;left:-1vw;bottom:-2vw;
+    font-size:clamp(110px,27vw,420px);letter-spacing:-.02em;
+    color:var(--ash-white);
+    white-space:nowrap;
+  }
+  .hero h1 span{display:inline-block; padding-top: .15em;margin-top: -0.15em; background: -webkit-linear-gradient(#ff9500, #ff0000);-webkit-background-clip:text;-webkit-text-fill-color: transparent;}
+  .hero h1 span:nth-child(2){transform:translateY(0) rotate(0);}
+  .hero h1 span:nth-child(3){transform:translateY(5%);}
+  .hero h1 span:nth-child(4){transform:rotate(0);color:var(--ember-amber);}
+  .hero h1 span:nth-child(5){transform:translateY(-6%);}
+  .hero h1 span:nth-child(6){transform:translateY(3%) rotate(-2deg);}
+  .hero h1 span:nth-child(7){transform:translateY(-2%) rotate(2deg);}
+
+  .tag{
+    position:absolute;background:var(--charcoal);color:var(--ash-white);
+    padding:6px 12px;font-weight:500;font-size:clamp(14px,1.6vw,20px);
+  }
+  .tag.a{top:9%;left:5%;transform:rotate(-4deg);background:var(--ember-amber);color:var(--charcoal);}
+  .tag.b{top:30%;right:7%;transform:rotate(3deg);max-width:22ch;}
+  .tag.c{top:55%;left:38%;transform:rotate(-1deg);border:2px solid var(--ash-white);background:transparent;}
+
+  /* ---------- sections ---------- */
+  section.sec{position:relative;padding:14vh 20px;scroll-margin-top:var(--header-h);}
+  .big{font-size:clamp(70px,16vw,240px);color:var(--ash-white);}
+  .big.orange{color:var(--flame-orange);}
+  p.body{font-size:clamp(17px,1.5vw,21px);max-width:38ch;font-weight:300;}
+
+  #about{display:grid;grid-template-columns:repeat(12,1fr);gap:0 16px;}
+  #about .big{grid-column:1/9;transform-origin:left;}
+  #about .p1{grid-column:8/13;margin-top:-8vw;}
+  #about .p2{grid-column:5/7;margin-top:4vw;color:var(--line);transform:rotate(-1.5deg);}
+
+  #services{background:var(--ash-white);color:var(--charcoal);}
+  #services .big{color:var(--charcoal);margin-bottom:6vh;background-color: #D8CFBD;}
+  .svc{
+    display:flex;align-items:baseline;gap:20px;
+    border-top:3px solid var(--charcoal);padding:14px 0; background-color: aliceblue;
+  }
+  .svc h3{font-size:clamp(36px,7vw,100px);}
+  .svc p{font-size:clamp(15px,1.3vw,19px);max-width:30ch;margin-left:auto;}
+  .svc:nth-of-type(2){padding-left:12vw;}
+  .svc:nth-of-type(3){padding-left:4vw;}
+  .svc:nth-of-type(3) h3{color:var(--flame-orange);}
+
+  #projects .big{margin-left:auto;text-align:right;}
+  .proj-wrap{display:grid;grid-template-columns:repeat(12,1fr);gap:20px;margin-top:6vh;}
+  .proj{padding:20px;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;}
+  .proj h3{font-size:clamp(28px,4vw,56px);}
+  .proj.p1{grid-column:1/7;background:var(--flame-orange);color:var(--charcoal);min-height:320px;}
+  .proj.p2{grid-column:8/13;border:3px solid var(--ash-white);margin-top:60px;transform:rotate(1.5deg);}
+  .proj.p3{grid-column:3/9;background:var(--grey-ash);margin-top:-30px;}
+
+  #contact{background:var(--ember-amber);color:var(--charcoal);overflow:hidden;}
+  #contact .big{color:var(--charcoal);}
+  #contact a.mail{
+    display:inline-block;margin-top:5vh;font-size:clamp(22px,4.5vw,64px);
+    font-weight:600;border-bottom:4px solid var(--charcoal);
+  }
+  #contact a.mail:hover{background:var(--charcoal);color:var(--ember-amber);}
+  footer{padding:16px 20px;font-size:14px;color:var(--brown-soft);}
+
+  /* ---------- scroll slide-ins ---------- */
+  .rv{opacity:0;transition:transform .8s cubic-bezier(.2,.7,.2,1),opacity .6s;will-change:transform;}
+  .rv.l{transform:translateX(-18vw);}
+  .rv.r{transform:translateX(18vw);}
+  .rv.u{transform:translateY(60px);}
+  .rv.in{opacity:1;transform:none;}
+  /* keep the hand-placed tilts after the slide */
+  .tag.rv.in.a{transform:rotate(-4deg);} .tag.rv.in.b{transform:rotate(3deg);} .tag.rv.in.c{transform:rotate(-1deg);}
+  .proj.p2.rv.in{transform:rotate(1.5deg);}
+  #about .p2.rv.in{transform:rotate(-1.5deg);}
+
+  @media (max-width:700px){
+    .nav-center{gap:14px;} .nav-center a{font-size:15px;}
+    #about .big,#about .p1,#about .p2{grid-column:1/13;margin-top:20px;}
+    .svc{flex-wrap:wrap;} .svc p{margin-left:0;}
+    .proj.p1,.proj.p2,.proj.p3{grid-column:1/13;margin-top:0;}
+    .tag.c{left:8%;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .rv{opacity:1;transition:none;}
+    .rv.l,.rv.r,.rv.u{transform:none;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <div class="logo-container"><a href="#home" aria-label="LöEmber home"><img src="images/fire_logo.webp" alt="LöEmber logo"></a></div>
+    <div class="nav-center">
+      <a href="#about">About</a>
+      <a href="#services">Services</a>
+      <a href="#projects">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero" id="home">
+    <img class="text-bg" src="images/screenshot.png" alt="" aria-hidden="true">
+    <div class="hero-overlay"></div>
+    <div class="hero-inner">
+      <p class="tag a rv l">hobby programmer</p>
+      <p class="tag b rv r">I rarely finish a project</p>
+      <p class="tag c rv u">this background is this site's code</p>
+      <h1 class="rv l" aria-label="LöEmber"><span>L</span><span>ö</span><span>E</span><span>m</span><span>b</span><span>e</span><span>r</span></h1>
+    </div>
+  </section>
+
+  <section class="sec" id="about">
+    <img class="text-bg" src="images/screenshot1.png" alt="" aria-hidden="true">
+    <h2 class="big rv l">About</h2>
+    <p class="body p1 rv r">I make and design websites. I waste a lot of time on useless things too.</p>
+    <p class="body p2 rv l">I use AI and Visual studio code.</p>
+  </section>
+
+  <section class="sec" id="services">
+    <img class="text-bg" src="images/screenshot2.png" alt="" aria-hidden="true">
+    <h2 class="big rv r">Services</h2>
+    <div class="svc rv l"><h3>Websites</h3><p>Simple, fast pages.</p></div>
+    <div class="svc rv r"><h3>Tools</h3><p>Scripts and utilities.</p></div>
+    <div class="svc rv l"><h3>Fixes</h3><p>Something broken? I'll take a look.</p></div>
+  </section>
+
+  <section class="sec" id="projects">
+    <img class="text-bg" src="images/screenshot3.png" alt="" aria-hidden="true">
+    <h2 class="big orange rv r">Projects</h2>
+    <div class="proj-wrap">
+      <article class="proj p1 rv l"><h3>Project 1</h3><p>asdasda</p></article>
+      <article class="proj p2 rv r"><h3>Project 2</h3><p>adsadas</p></article>
+      <article class="proj p3 rv l"><h3>Project 3</h3><p>asdasdasd.</p></article>
+    </div>
+  </section>
+
+  <section class="sec" id="contact">
+    <h2 class="big rv l">Contact</h2>
+    <a class="mail rv r" href="mailto:5loember5@gmail.com">5loember5@gmail.com</a>
+  </section>
+</main>
+<footer>© LöEmber</footer>
+
+<script>
+  const els = document.querySelectorAll('.rv');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  },{threshold:.15});
+  els.forEach((el,i)=>{
+    // hero items get a small stagger on load
+    if(el.closest('.hero')) el.style.transitionDelay = (i*0.12)+'s';
+    io.observe(el);
+  });
+</script>
+</body>
+</html>
