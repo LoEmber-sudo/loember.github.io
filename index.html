@@ -5,10 +5,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LöEmber - Hobby Programmer</title>
+<link rel="stylesheet" href="https://pyscript.net/releases/2024.11.1/core.css">
+<script type="module" src="https://pyscript.net/releases/2024.11.1/core.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+    canvas#sim{
+    position:fixed;top:0;left:0;width:100%;height:100%;
+    display:block;pointer-events:none;z-index:200;
+  }
+
   :root{
     --charcoal:#151311;
     --ember-amber:#FFB52E;
@@ -59,7 +66,7 @@
   .hero-inner{position:absolute;inset:0;}
 
   .hero h1{
-    position:absolute;left:-1vw;bottom:-2vw;
+    position:absolute;left:-1vw;bottom:0vw;
     font-size:clamp(110px,27vw,420px);letter-spacing:-.02em;
     color:var(--ash-white);
     white-space:nowrap;
@@ -78,7 +85,7 @@
   }
   .tag.a{top:9%;left:5%;transform:rotate(-4deg);background:var(--ember-amber);color:var(--charcoal);}
   .tag.b{top:30%;right:7%;transform:rotate(3deg);max-width:22ch;}
-  .tag.c{top:55%;left:38%;transform:rotate(-1deg);border:2px solid var(--ash-white);background:transparent;}
+  .tag.c{top:20%;left:38%;transform:rotate(-1deg);border:2px solid var(--ash-white);background:transparent;}
 
   /* ---------- sections ---------- */
   section.sec{position:relative;padding:14vh 20px;scroll-margin-top:var(--header-h);}
@@ -91,6 +98,28 @@
   #about .p1{grid-column:8/13;margin-top:-8vw;}
   #about .p2{grid-column:5/7;margin-top:4vw;color:var(--line);transform:rotate(-1.5deg);}
 
+/* ---------- orbit sandbox ---------- */
+#orbit{background:var(--grey-ash);}
+#orbit .big{margin-bottom:5vh;}
+.orbit-wrap{
+  display:grid;grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr);
+  gap:32px;align-items:start;max-width:1500px;
+}
+.orbit-wrap canvas{
+  width:100%;display:block;aspect-ratio:800/520;
+  border:3px solid var(--ash-white);background:#0b0b1a;
+}
+.orbit-controls{display:grid;gap:1.1rem;margin:0 0 1.5rem;}
+.orbit-controls label{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .75rem;}
+.orbit-controls .name{flex:1;font-weight:500;}
+.orbit-controls .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--ember-amber);}
+.orbit-controls input[type=range]{flex-basis:100%;order:3;accent-color:var(--flame-orange);}
+#orb-respawn{
+  padding:.5rem 1.2rem;font:500 1rem 'Jost',sans-serif;cursor:pointer;
+  background:var(--flame-orange);color:var(--charcoal);border:3px solid var(--ash-white);
+}
+#orb-respawn:hover{background:var(--ember-amber);}
+.orbit-tip{margin-top:1.2rem;opacity:.7;font-weight:300;max-width:60ch;}
   #services{background:var(--ash-white);color:var(--charcoal);}
   #services .big{color:var(--charcoal);margin-bottom:6vh;background-color: #D8CFBD;}
   .svc{
@@ -137,6 +166,7 @@
     .svc{flex-wrap:wrap;} .svc p{margin-left:0;}
     .proj.p1,.proj.p2,.proj.p3{grid-column:1/13;margin-top:0;}
     .tag.c{left:8%;}
+    .orbit-wrap{grid-template-columns:1fr;}
   }
   @media (prefers-reduced-motion:reduce){
     .rv{opacity:1;transition:none;}
@@ -145,7 +175,7 @@
 </style>
 </head>
 <body>
-
+<canvas id="sim"></canvas>
 <header>
   <nav>
     <div class="logo-container"><a href="#home" aria-label="LöEmber home"><img src="images/fire_logo.webp" alt="LöEmber logo"></a></div>
@@ -173,8 +203,35 @@
   <section class="sec" id="about">
     <img class="text-bg" src="images/screenshot1.png" alt="" aria-hidden="true">
     <h2 class="big rv l">About</h2>
-    <p class="body p1 rv r">I make and design websites. I waste a lot of time on useless things too.</p>
+    <p class="body p1 rv r">I make and design websites. Hint: hold right click if you are on pc.</p>
     <p class="body p2 rv l">I use AI and Visual studio code.</p>
+  </section>
+
+  <section class="sec" id="orbit">
+    <h2 class="big orange rv l">Orbit</h2>
+    <div class="orbit-wrap rv u">
+      <canvas id="orbit-sim" width="800" height="520"></canvas>
+
+      <div class="orbit-controls">
+        <label><span class="name">Central mass</span>
+          <input id="orb-mass" type="range" min="500" max="12000" step="100" value="6000">
+          <span class="val" id="orb-mass_val"></span></label>
+        <label><span class="name">Particles</span>
+          <input id="orb-count" type="range" min="1" max="250" value="200">
+          <span class="val" id="orb-count_val"></span></label>
+        <label><span class="name">Orbit speed</span>
+          <input id="orb-orbit" type="range" min="0.3" max="1.5" step="0.01" value="0.3">
+          <span class="val" id="orb-orbit_val"></span></label>
+        <label><span class="name">Time speed</span>
+          <input id="orb-speed" type="range" min="0.2" max="3" step="0.1" value="0.5">
+          <span class="val" id="orb-speed_val"></span></label>
+        <label><span class="name">Trail length</span>
+          <input id="orb-trail" type="range" min="0" max="97" value="75">
+          <span class="val" id="orb-trail_val"></span></label>
+      </div>
+      <button id="orb-respawn">Respawn particles</button>
+      <p class="orbit-tip">Tip: orbit speed 1.0 gives circular orbits, below 1 gives falling ellipses, above ~1.4 particles escape.</p>
+    </div>
   </section>
 
   <section class="sec" id="services">
@@ -214,6 +271,265 @@
     if(el.closest('.hero')) el.style.transitionDelay = (i*0.12)+'s';
     io.observe(el);
   });
+</script>
+
+<!-- ===== Ball that follows the mouse (full-page overlay) ===== -->
+<script type="py">
+import math
+from pyscript import document, window
+from pyodide.ffi import create_proxy
+ 
+canvas = document.getElementById("sim")
+ctx = canvas.getContext("2d")
+ 
+BALL_R = 16
+PUSH_RANGE = 70
+STRENGTH = 10        # how hard the mouse pushes / pulls
+TRAIL_LEN = 18
+ 
+W = H = 0
+dpr = 1
+ 
+ 
+def resize(event=None):
+    """Make the canvas match the viewport (sharp on hi-dpi screens)."""
+    global W, H, dpr
+    dpr = window.devicePixelRatio or 1
+    W, H = window.innerWidth, window.innerHeight
+    canvas.width = int(W * dpr)
+    canvas.height = int(H * dpr)
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+ 
+ 
+resize()
+ 
+ball = {"x": W / 2, "y": H / 2, "vx": 0.0, "vy": 0.0}
+mouse = {"x": 0.0, "y": 0.0, "inside": False, "down": False}
+trail = []
+ 
+ 
+def update_ball():
+    ax = ay = 0.0
+    if mouse["inside"]:
+        dx, dy = ball["x"] - mouse["x"], ball["y"] - mouse["y"]
+        d = math.hypot(dx, dy) + 0.001
+        if mouse["down"]:
+            ax -= dx * 0.0006 * STRENGTH            # pull toward the pointer
+            ay -= dy * 0.0006 * STRENGTH
+        elif d < PUSH_RANGE:
+            f = (1 - d / PUSH_RANGE) * STRENGTH * 0.25   # push away, stronger when closer
+            ax += dx / d * f
+            ay += dy / d * f
+ 
+    ball["vx"] = (ball["vx"] + ax) * 0.992        # a little friction
+    ball["vy"] = (ball["vy"] + ay) * 0.992
+    ball["x"] += ball["vx"]
+    ball["y"] += ball["vy"]
+ 
+    # bounce off the screen edges
+    if ball["x"] < BALL_R:
+        ball["x"], ball["vx"] = BALL_R, abs(ball["vx"]) * 0.8
+    if ball["x"] > W - BALL_R:
+        ball["x"], ball["vx"] = W - BALL_R, -abs(ball["vx"]) * 0.8
+    if ball["y"] < BALL_R:
+        ball["y"], ball["vy"] = BALL_R, abs(ball["vy"]) * 0.8
+    if ball["y"] > H - BALL_R:
+        ball["y"], ball["vy"] = H - BALL_R, -abs(ball["vy"]) * 0.8
+ 
+    trail.append((ball["x"], ball["y"]))
+    if len(trail) > TRAIL_LEN:
+        trail.pop(0)
+ 
+ 
+def draw():
+    # transparent overlay: clear every frame so the page shows through
+    ctx.clearRect(0, 0, W, H)
+    ctx.shadowBlur = 0
+ 
+    # trail
+    n = len(trail)
+    for i, (tx, ty) in enumerate(trail):
+        t = (i + 1) / n
+        ctx.fillStyle = f"rgba(255, 87, 34, {t * 0.3:.3f})"
+        ctx.beginPath()
+        ctx.arc(tx, ty, BALL_R * (0.4 + 0.6 * t), 0, 2 * math.pi)
+        ctx.fill()
+ 
+    # mouse influence ring
+    if mouse["inside"]:
+        ctx.strokeStyle = "rgba(255,255,255,0.45)" if not mouse["down"] else "rgba(120,200,255,0.8)"
+        ctx.lineWidth = 1.5
+        ctx.beginPath()
+        ctx.arc(mouse["x"], mouse["y"], PUSH_RANGE if not mouse["down"] else 10, 0, 2 * math.pi)
+        ctx.stroke()
+ 
+    # the ball
+    ctx.shadowBlur = 25
+    ctx.shadowColor = "#FFB52E"
+    ctx.fillStyle = "#FF5722"
+    ctx.beginPath()
+    ctx.arc(ball["x"], ball["y"], BALL_R, 0, 2 * math.pi)
+    ctx.fill()
+    ctx.shadowBlur = 0
+ 
+ 
+def frame(timestamp=None):
+    update_ball()
+    draw()
+    window.requestAnimationFrame(frame_proxy)
+ 
+ 
+frame_proxy = create_proxy(frame)
+ 
+ 
+# ---- input: listen on the whole window, since the canvas ignores pointer events ----
+def on_move(e):
+    mouse["inside"] = True
+    mouse["x"], mouse["y"] = e.clientX, e.clientY
+ 
+ 
+def on_down(e):
+    mouse["inside"] = True
+    mouse["down"] = True
+    mouse["x"], mouse["y"] = e.clientX, e.clientY
+ 
+ 
+def on_up(e):
+    mouse["down"] = False
+ 
+ 
+def on_leave(e):
+    mouse["inside"] = False
+    mouse["down"] = False
+ 
+ 
+window.addEventListener("pointermove", create_proxy(on_move))
+window.addEventListener("pointerdown", create_proxy(on_down))
+window.addEventListener("pointerup", create_proxy(on_up))
+window.addEventListener("pointercancel", create_proxy(on_leave))
+window.addEventListener("blur", create_proxy(on_leave))
+window.addEventListener("resize", create_proxy(resize))
+document.documentElement.addEventListener("mouseleave", create_proxy(on_leave))
+frame()
+</script>
+
+<!-- ===== Orbit sandbox (own isolated Python environment so names don't clash with the ball above) ===== -->
+<script type="py">
+def orbit_main():
+    import math, random
+    from pyscript import document, window
+    from pyodide.ffi import create_proxy
+
+    canvas = document.getElementById("orbit-sim")
+    ctx = canvas.getContext("2d")
+    W, H = canvas.width, canvas.height
+    CX, CY = W / 2, H / 2
+    CORE = 14      # radius of the central body (px)
+    SOFT = 12      # softening so particles don't blow up near the center
+    SUBSTEPS = 4
+
+    particles = []
+
+
+    def val(element_id):
+        return float(document.getElementById("orb-" + element_id).value)
+
+
+    def spawn():
+        """New particle at a random distance, moving sideways at orbital speed."""
+        r = random.uniform(50, 240)
+        a = random.uniform(0, 2 * math.pi)
+        v = math.sqrt(val("mass") / r) * val("orbit") * random.uniform(0.96, 1.04)
+        return [CX + r * math.cos(a), CY + r * math.sin(a),
+                -v * math.sin(a), v * math.cos(a)]
+
+
+    def step():
+        gm = val("mass")
+        dt = val("speed") / SUBSTEPS
+        for _ in range(SUBSTEPS):
+            for p in particles:
+                dx, dy = CX - p[0], CY - p[1]
+                d2 = dx * dx + dy * dy + SOFT * SOFT
+                k = gm / (d2 * math.sqrt(d2))     # gravity: a = GM / r^2, pointing at the center
+                p[2] += dx * k * dt
+                p[3] += dy * k * dt
+                p[0] += p[2] * dt
+                p[1] += p[3] * dt
+
+
+    def draw():
+        # fading rectangle = trails
+        alpha = max(0.03, 1 - val("trail") / 100)
+        ctx.shadowBlur = 0
+        ctx.fillStyle = f"rgba(11, 11, 26, {alpha})"
+        ctx.fillRect(0, 0, W, H)
+
+        for p in particles:
+            speed = math.hypot(p[2], p[3])
+            hue = max(0, 220 - speed * 22)       # fast = warm, slow = cool
+            ctx.fillStyle = f"hsl({hue:.0f}, 90%, 65%)"
+            ctx.beginPath()
+            ctx.arc(p[0], p[1], 2.2, 0, 2 * math.pi)
+            ctx.fill()
+
+        # central body with glow
+        ctx.shadowBlur = 35
+        ctx.shadowColor = "#ffb347"
+        ctx.fillStyle = "#ffcf70"
+        ctx.beginPath()
+        ctx.arc(CX, CY, CORE, 0, 2 * math.pi)
+        ctx.fill()
+        ctx.shadowBlur = 0
+
+
+    def frame(timestamp=None):
+        # keep particle count in sync with the slider
+        target = int(val("count"))
+        while len(particles) < target:
+            particles.append(spawn())
+        while len(particles) > target:
+            particles.pop()
+
+        step()
+
+        # recycle particles that hit the core or fly far away
+        for p in particles:
+            r2 = (p[0] - CX) ** 2 + (p[1] - CY) ** 2
+            if r2 < CORE * CORE or r2 > 1200 * 1200:
+                p[:] = spawn()
+
+        draw()
+        window.requestAnimationFrame(frame_proxy)
+
+
+    frame_proxy = create_proxy(frame)
+
+
+    def respawn(event=None):
+        particles.clear()
+
+
+    def update_labels(event=None):
+        document.getElementById("orb-mass_val").innerText = f"{val('mass'):.0f}"
+        document.getElementById("orb-count_val").innerText = f"{val('count'):.0f}"
+        document.getElementById("orb-orbit_val").innerText = f"{val('orbit'):.2f}x"
+        document.getElementById("orb-speed_val").innerText = f"{val('speed'):.1f}x"
+        document.getElementById("orb-trail_val").innerText = f"{val('trail'):.0f}%"
+
+
+    label_proxy = create_proxy(update_labels)
+    for slider in ("mass", "count", "orbit", "speed", "trail"):
+        document.getElementById("orb-" + slider).addEventListener("input", label_proxy)
+    document.getElementById("orb-respawn").addEventListener("click", create_proxy(respawn))
+
+    update_labels()
+    ctx.fillStyle = "#0b0b1a"
+    ctx.fillRect(0, 0, W, H)
+    frame()
+
+
+orbit_main()
 </script>
 </body>
 </html>
